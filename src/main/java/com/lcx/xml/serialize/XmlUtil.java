@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -179,7 +178,9 @@ public class XmlUtil {
 
             } else if (isCollection(fields[i].getType())) {
                 Collection<?> value = (Collection<?>) getFieldValueByName(object, fields[i]);
-                makeCollection(element, fields[i], value);
+                if (value != null) {
+                    makeCollection(element.addElement(fields[i].getName()), value);
+                }
             } else if (isMap(fields[i].getType())) {
 
             } else {
@@ -234,12 +235,14 @@ public class XmlUtil {
 
     }
 
-    private static void makeCollection(Element listElement, Field field, Collection<?> collection) throws Exception {
+    private static void parseArray() {
+
+    }
+
+    private static void makeCollection(Element element, Collection<?> collection) throws Exception {
         if (collection == null || collection.size() == 0) {
             return;
         }
-
-        Element element = listElement.addElement(field.getName());
 
         for (Object item : collection) {
             Element itemElement = element.addElement(item.getClass().getSimpleName());
@@ -247,12 +250,12 @@ public class XmlUtil {
         }
     }
 
-    private static <T> List<T> parseCollection(Element element, Class<T> cls) throws Exception {
+    private static <T> Collection<T> parseCollection(Element element, Class<T> cls) throws Exception {
         if (element == null) {
             return null;
         }
 
-        List<T> list = new ArrayList<T>();
+        Collection<T> list = new ArrayList<T>();
 
         for (Iterator<?> iterator = element.elementIterator(); iterator.hasNext();) {
             Element itemElement = (Element) iterator.next();

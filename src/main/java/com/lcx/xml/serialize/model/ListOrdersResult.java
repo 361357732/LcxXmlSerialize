@@ -1,10 +1,10 @@
 package com.lcx.xml.serialize.model;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class ListOrdersResult {
 
-    private ArrayList<Order> Orders;
+    private List<Order> Orders;
 
     private String CreatedBefore;
 
@@ -20,11 +20,11 @@ public class ListOrdersResult {
         this.errorMessage = errorMessage;
     }
 
-    public ArrayList<Order> getOrders() {
+    public List<Order> getOrders() {
         return Orders;
     }
 
-    public void setOrders(ArrayList<Order> orders) {
+    public void setOrders(List<Order> orders) {
         Orders = orders;
     }
 
