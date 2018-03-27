@@ -1,10 +1,8 @@
 package com.lcx.xml.serialize.model;
 
-import java.util.List;
-
 public class ListOrdersResult {
 
-    private List<Order> Orders;
+    private Order[] Orders;
 
     private String CreatedBefore;
 
@@ -12,19 +10,11 @@ public class ListOrdersResult {
 
     private String errorMessage;
 
-    public String getErrorMessage() {
-        return errorMessage;
-    }
-
-    public void setErrorMessage(String errorMessage) {
-        this.errorMessage = errorMessage;
-    }
-
-    public List<Order> getOrders() {
+    public Order[] getOrders() {
         return Orders;
     }
 
-    public void setOrders(List<Order> orders) {
+    public void setOrders(Order[] orders) {
         Orders = orders;
     }
 
@@ -44,10 +34,12 @@ public class ListOrdersResult {
         NextToken = nextToken;
     }
 
-    @Override
-    public String toString() {
-        return "ListOrdersResult [Orders=" + Orders + ", CreatedBefore=" + CreatedBefore + ", NextToken=" + NextToken
-                + "]";
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 
 }

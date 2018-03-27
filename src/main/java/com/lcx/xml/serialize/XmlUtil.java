@@ -45,12 +45,6 @@ public class XmlUtil {
         ListOrdersResponse response = from(document.asXML(), new TypeReference<ListOrdersResponse>() {
         });
         println(toXml(response));
-
-        println("111111111 : " + new TypeReference<String[]>() {
-        }.getRawType());
-
-        String[] data = new String[10];
-        println(data.getClass().getComponentType().getName());
     }
 
     public static String toXml(Object object) throws Exception {
@@ -188,7 +182,8 @@ public class XmlUtil {
             list.add(parseObj(itemElement, cls));
         }
 
-        return (T[]) list.toArray();
+        T[] array = (T[]) Array.newInstance(cls, list.size());
+        return (T[]) list.toArray(array);
     }
 
     private static void makeCollection(Element element, Collection<?> collection) throws Exception {
@@ -273,7 +268,8 @@ public class XmlUtil {
         String firstLetter = field.getName().substring(0, 1).toUpperCase();
         String setter = String.format("set%s%s", firstLetter, field.getName().substring(1));
         Method method = obj.getClass().getMethod(setter, field.getType());
-        method.invoke(obj, parseSingleValue(field.getType(), value));
+        Object object = parseSingleValue(field.getType(), value);
+        method.invoke(obj, object);
     }
 
     private static boolean isSingle(Class<?> cls) {
@@ -321,28 +317,27 @@ public class XmlUtil {
 
     };
 
-    @SuppressWarnings("unchecked")
-    private static <T> T parseSingleValue(Class<T> cls, Object value) {
+    private static Object parseSingleValue(Class<?> cls, Object value) {
         if (cls == boolean.class || cls == Boolean.class) {
-            return (T) Boolean.valueOf((String) value);
+            return Boolean.valueOf((String) value);
         } else if (cls == byte.class || cls == Byte.class) {
-            return (T) Byte.valueOf((String) value);
+            return Byte.valueOf((String) value);
         } else if (cls == char.class || cls == Character.class) {
-            return (T) Character.valueOf((Character) value);
+            return Character.valueOf((Character) value);
         } else if (cls == short.class || cls == Short.class) {
-            return (T) Short.valueOf((String) value);
+            return Short.valueOf((String) value);
         } else if (cls == int.class || cls == Integer.class) {
-            return (T) Integer.valueOf((String) value);
+            return Integer.valueOf((String) value);
         } else if (cls == long.class || cls == Long.class) {
-            return (T) Long.valueOf((String) value);
+            return Long.valueOf((String) value);
         } else if (cls == float.class || cls == Float.class) {
-            return (T) Float.valueOf((String) value);
+            return Float.valueOf((String) value);
         } else if (cls == double.class || cls == Double.class) {
-            return (T) Double.valueOf((String) value);
+            return Double.valueOf((String) value);
         } else if (cls == UUID.class) {
-            return (T) UUID.fromString((String) value);
+            return UUID.fromString((String) value);
         } else {
-            return (T) value;
+            return value;
         }
     }
 
