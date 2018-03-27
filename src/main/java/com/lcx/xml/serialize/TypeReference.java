@@ -33,4 +33,18 @@ public abstract class TypeReference<T> {
         return type instanceof Class<?> ? (Class<?>) type : (Class<?>) ((ParameterizedType) type).getRawType();
     }
 
+    protected Class<?> getGenericType() {
+        String tempNames = type.getTypeName().replace(">", "");
+        String[] clsNames = tempNames.split("<");
+        Class<?> cls = null;
+        if (clsNames.length > 1) {
+            try {
+                cls = Class.forName(clsNames[1]);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        return cls;
+    }
+
 }
