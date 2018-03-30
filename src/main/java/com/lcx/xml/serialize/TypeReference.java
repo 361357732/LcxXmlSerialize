@@ -5,6 +5,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
+/**
+ * Getting generic type
+ * @author lcx
+ *
+ * @param <T> Generic type to be parsed
+ */
 public abstract class TypeReference<T> {
 
     private final Type type;
@@ -18,6 +24,14 @@ public abstract class TypeReference<T> {
         this.type = ((ParameterizedType) superclass).getActualTypeArguments()[0];
     }
 
+    /**
+     * Instantiate generic types
+     * @return
+     * @throws NoSuchMethodException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     * @throws InstantiationException
+     */
     @SuppressWarnings("unchecked")
     protected T newInstance() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException,
             InstantiationException {
@@ -29,22 +43,12 @@ public abstract class TypeReference<T> {
         return (T) constructor.newInstance();
     }
 
-    protected Class<?> getRawType() {
-        return type instanceof Class<?> ? (Class<?>) type : (Class<?>) ((ParameterizedType) type).getRawType();
-    }
-
-    protected Class<?> getGenericType() {
-        String tempNames = type.getTypeName().replace(">", "");
-        String[] clsNames = tempNames.split("<");
-        Class<?> cls = null;
-        if (clsNames.length > 1) {
-            try {
-                cls = Class.forName(clsNames[1]);
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
-        return cls;
+    /**
+     * Return the generic type that you want to parse
+     * @return
+     */
+    protected Type getType() {
+        return type;
     }
 
 }

@@ -24,24 +24,12 @@ import com.lcx.xml.serialize.model.ListOrdersResponse;
 
 public class XmlUtil {
 
+    private static final String arraySuffix = "Array";
+
     public static void main(String[] args) throws Exception {
         SAXReader reader = new SAXReader();
         Document document = reader.read("E:\\work\\test.txt");
-        // println(document.asXML());
 
-        // ListOrdersResponse response = from(document.asXML(),
-        // ListOrdersResponse.class);
-        //
-        // String xml = toXml(response);
-        // println(xml);
-        //
-        // ListOrdersResponse obj = from(xml, new
-        // TypeReference<ListOrdersResponse>() {
-        // });
-        // println(toXml(obj));
-
-        // ListOrdersResponse response = from(document.asXML(),
-        // ListOrdersResponse.class);
         ListOrdersResponse response = from(document.asXML(), new TypeReference<ListOrdersResponse>() {
         });
         println(toXml(response));
@@ -52,6 +40,12 @@ public class XmlUtil {
 
         if (isSingle(object.getClass())) {
             formatSingleValue(object);
+        } else if (isArray(object.getClass())) {
+            makeArray(document.addElement(object.getClass().getComponentType().getSimpleName() + arraySuffix), object);
+        } else if (isCollection(object.getClass())) {
+            makeCollection(document.addElement(object.getClass().getSimpleName()), (Collection<?>) object);
+        } else if (isMap(object.getClass())) {
+
         } else {
             makeObject(document.addElement(object.getClass().getSimpleName()), object);
         }
@@ -60,65 +54,97 @@ public class XmlUtil {
     }
 
     public static <T> T from(String message, Class<T> cls) throws Exception {
-        return parse(message, null, cls, null);
+        List<Class<?>> list = new ArrayList<Class<?>>();
+        list.add(cls);
+
+        return parse(message, null, list);
     }
 
     public static <T> T from(String message, String nodeName, Class<T> cls) throws Exception {
-        return parse(message, nodeName, cls, null);
+        List<Class<?>> list = new ArrayList<Class<?>>();
+        list.add(cls);
+
+        return parse(message, nodeName, list);
     }
 
     public static <T> T from(String message, TypeReference<T> type) throws Exception {
-        return parse(message, null, type.getRawType(), type.getGenericType());
+        return parse(message, null, getClassList(type.getType()));
     }
 
     public static <T> T from(String message, String nodeName, TypeReference<T> type) throws Exception {
-        return parse(message, nodeName, type.getRawType(), type.getGenericType());
+        return parse(message, nodeName, getClassList(type.getType()));
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T parse(String message, String nodeName, Class<?> cls, Class<?> genericType) throws Exception {
+    private static <T> T parse(String message, String nodeName, List<Class<?>> list) throws Exception {
         Element element = getElement(message, nodeName);
 
+        Class<?> cls = list.get(0);
         if (isSingle(cls)) {
             return (T) parseSingleValue(cls, element.getText());
         } else if (isArray(cls)) {
             return (T) parseArray(element, cls.getComponentType());
         } else if (isCollection(cls)) {
-            return (T) parseCollection(element, genericType);
+            return (T) parseCollection(element, list, 1);
         } else if (isMap(cls)) {
             return null;
         } else {
-            return (T) parseObj(element, cls);
+            return (T) parseObject(element, cls);
         }
     }
 
     private static void makeObject(Element element, Object object) throws Exception {
         Field[] fields = object.getClass().getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
-            if (isSingle(fields[i].getType())) {
-                addElement(element, object, fields[i]);
-            } else if (isArray(fields[i].getType())) {
-                Object value = getFieldValueByName(object, fields[i]);
-                if (value != null) {
-                    makeArray(element.addElement(fields[i].getName()), value);
-                }
-            } else if (isCollection(fields[i].getType())) {
-                Collection<?> value = (Collection<?>) getFieldValueByName(object, fields[i]);
-                if (value != null) {
-                    makeCollection(element.addElement(fields[i].getName()), value);
-                }
-            } else if (isMap(fields[i].getType())) {
+            Object item = getFieldValueByName(object, fields[i]);
 
+            addElement(element, fields[i].getName(), item);
+        }
+    }
+
+    private static void makeArray(Element element, Object array) throws Exception {
+        if (array == null) {
+            return;
+        }
+
+        for (int i = 0; i < Array.getLength(array); ++i) {
+            Object item = Array.get(array, i);
+
+            addElement(element, item.getClass().getSimpleName(), item);
+        }
+    }
+
+    private static void makeCollection(Element element, Collection<?> collection) throws Exception {
+        if (collection == null || collection.size() == 0) {
+            return;
+        }
+
+        for (Object item : collection) {
+            if (isArray(item.getClass())) {
+                addElement(element, item.getClass().getComponentType().getSimpleName() + arraySuffix, item);
             } else {
-                Object value = getFieldValueByName(object, fields[i]);
-                if (value != null) {
-                    makeObject(element.addElement(fields[i].getName()), value);
-                }
+                addElement(element, item.getClass().getSimpleName(), item);
             }
         }
     }
 
-    private static <T> T parseObj(Element parentElement, Class<T> cls) throws Exception {
+    private static void addElement(Element element, String name, Object value) throws Exception {
+        if (value != null) {
+            if (isSingle(value.getClass())) {
+                element.addElement(name).setText(formatSingleValue(value));
+            } else if (isArray(value.getClass())) {
+                makeArray(element.addElement(name), value);
+            } else if (isCollection(value.getClass())) {
+                makeCollection(element.addElement(name), (Collection<?>) value);
+            } else if (isMap(value.getClass())) {
+
+            } else {
+                makeObject(element.addElement(name), value);
+            }
+        }
+    }
+
+    private static <T> T parseObject(Element parentElement, Class<T> cls) throws Exception {
         if (parentElement == null || cls == null) {
             return null;
         }
@@ -132,7 +158,7 @@ public class XmlUtil {
         for (int i = 0; i < fields.length; i++) {
             Attribute attribute = parentElement.attribute(fields[i].getName());
             if (attribute != null) {
-                setFieldValueByName(obj, fields[i], attribute.getValue());
+                setFieldValueByName(obj, fields[i], parseSingleValue(fields[i].getType(), attribute.getValue()));
                 continue;
             }
 
@@ -141,32 +167,26 @@ public class XmlUtil {
                 continue;
             }
 
-            if (isSingle(fields[i].getType())) {
-                setFieldValueByName(obj, fields[i], element.getText());
-            } else if (isArray(fields[i].getType())) {
-                setFieldValueByName(obj, fields[i], parseArray(element, fields[i].getType().getComponentType()));
-            } else if (isCollection(fields[i].getType())) {
-                setFieldValueByName(obj, fields[i], parseCollection(element, getGenericType(fields[i])));
-            } else if (isMap(fields[i].getType())) {
+            Object value = parseElement(element, fields[i]);
 
-            } else {
-                setFieldValueByName(obj, fields[i], parseObj(element, fields[i].getType()));
-            }
+            setFieldValueByName(obj, fields[i], value);
         }
 
         return obj;
     }
 
-    private static void makeArray(Element element, Object array) throws Exception {
-        if (array == null) {
-            return;
-        }
-
-        for (int i = 0; i < Array.getLength(array); ++i) {
-            Object item = Array.get(array, i);
-
-            Element itemElement = element.addElement(item.getClass().getSimpleName());
-            makeObject(itemElement, item);
+    private static Object parseElement(Element element, Field field) throws Exception {
+        if (isSingle(field.getType())) {
+            return element.getText();
+        } else if (isArray(field.getType())) {
+            return parseArray(element, field.getType().getComponentType());
+        } else if (isCollection(field.getType())) {
+            List<Class<?>> list = getClassList(field.getGenericType());
+            return parseCollection(element, list, 1);
+        } else if (isMap(field.getType())) {
+            return null;
+        } else {
+            return parseObject(element, field.getType());
         }
     }
 
@@ -179,33 +199,46 @@ public class XmlUtil {
         List<T> list = new ArrayList<T>();
         for (Iterator<?> iterator = element.elementIterator(); iterator.hasNext();) {
             Element itemElement = (Element) iterator.next();
-            list.add(parseObj(itemElement, cls));
+
+            if (isSingle(cls)) {
+                list.add(parseSingleValue(cls, itemElement.getText()));
+            } else if (isArray(cls)) {
+                list.add((T) parseArray(itemElement, cls.getComponentType()));
+            } else if (isCollection(cls)) {
+                List<Class<?>> clsList = getClassList(cls.getGenericSuperclass());
+                list.add((T) parseCollection(itemElement, clsList, 1));
+            } else if (isMap(cls)) {
+
+            } else {
+                list.add(parseObject(itemElement, cls));
+            }
         }
 
         T[] array = (T[]) Array.newInstance(cls, list.size());
         return (T[]) list.toArray(array);
     }
 
-    private static void makeCollection(Element element, Collection<?> collection) throws Exception {
-        if (collection == null || collection.size() == 0) {
-            return;
-        }
-
-        for (Object item : collection) {
-            Element itemElement = element.addElement(item.getClass().getSimpleName());
-            makeObject(itemElement, item);
-        }
-    }
-
-    private static <T> Collection<T> parseCollection(Element element, Class<T> cls) throws Exception {
-        if (element == null) {
+    private static Collection<?> parseCollection(Element element, List<Class<?>> clsList, int index) throws Exception {
+        if (element == null || clsList.size() == 0) {
             return null;
         }
 
-        Collection<T> list = new ArrayList<T>();
+        Class<?> cls = clsList.get(index);
+        Collection<Object> list = new ArrayList<Object>();
         for (Iterator<?> iterator = element.elementIterator(); iterator.hasNext();) {
             Element itemElement = (Element) iterator.next();
-            list.add(parseObj(itemElement, cls));
+
+            if (isSingle(cls)) {
+                list.add(parseSingleValue(cls, itemElement.getText()));
+            } else if (isArray(cls)) {
+                list.add(parseArray(itemElement, cls.getComponentType()));
+            } else if (isCollection(cls)) {
+                list.add(parseCollection(itemElement, clsList, index + 1));
+            } else if (isMap(cls)) {
+
+            } else {
+                list.add(parseObject(itemElement, cls));
+            }
         }
 
         return list;
@@ -229,25 +262,26 @@ public class XmlUtil {
         }
     }
 
-    private static void addElement(Element element, Object object, Field field) throws Exception {
-        Object value = getFieldValueByName(object, field);
-        if (value != null) {
-            element.addElement(field.getName()).setText(String.valueOf(value));
-        }
+    private static List<Class<?>> getClassList(Type type) {
+        List<Class<?>> list = new ArrayList<Class<?>>();
+
+        list.add(getRawType(type));
+        getGenericType(list, type);
+
+        return list;
     }
 
-    private static Class<?> getGenericType(Field f) {
-        Class<?> c = null;
-        Type gType = f.getGenericType();
-        if (gType instanceof ParameterizedType) {
-            ParameterizedType ptype = (ParameterizedType) gType;
-            Type[] targs = ptype.getActualTypeArguments();
-            if (targs != null && targs.length > 0) {
-                Type t = targs[0];
-                c = (Class<?>) t;
+    private static Class<?> getRawType(Type type) {
+        return type instanceof Class<?> ? (Class<?>) type : (Class<?>) ((ParameterizedType) type).getRawType();
+    }
+
+    private static void getGenericType(List<Class<?>> list, Type type) {
+        if (ParameterizedType.class.isAssignableFrom(type.getClass())) {
+            for (Type t : ((ParameterizedType) type).getActualTypeArguments()) {
+                list.add(getRawType(t));
+                getGenericType(list, t);
             }
         }
-        return c;
     }
 
     private static Object getFieldValueByName(Object obj, Field field) throws Exception {
@@ -317,27 +351,28 @@ public class XmlUtil {
 
     };
 
-    private static Object parseSingleValue(Class<?> cls, Object value) {
+    @SuppressWarnings("unchecked")
+    private static <T> T parseSingleValue(Class<T> cls, Object value) {
         if (cls == boolean.class || cls == Boolean.class) {
-            return Boolean.valueOf((String) value);
+            return (T) Boolean.valueOf((String) value);
         } else if (cls == byte.class || cls == Byte.class) {
-            return Byte.valueOf((String) value);
+            return (T) Byte.valueOf((String) value);
         } else if (cls == char.class || cls == Character.class) {
-            return Character.valueOf((Character) value);
+            return (T) Character.valueOf((Character) value);
         } else if (cls == short.class || cls == Short.class) {
-            return Short.valueOf((String) value);
+            return (T) Short.valueOf((String) value);
         } else if (cls == int.class || cls == Integer.class) {
-            return Integer.valueOf((String) value);
+            return (T) Integer.valueOf((String) value);
         } else if (cls == long.class || cls == Long.class) {
-            return Long.valueOf((String) value);
+            return (T) Long.valueOf((String) value);
         } else if (cls == float.class || cls == Float.class) {
-            return Float.valueOf((String) value);
+            return (T) Float.valueOf((String) value);
         } else if (cls == double.class || cls == Double.class) {
-            return Double.valueOf((String) value);
+            return (T) Double.valueOf((String) value);
         } else if (cls == UUID.class) {
-            return UUID.fromString((String) value);
+            return (T) UUID.fromString((String) value);
         } else {
-            return value;
+            return (T) value;
         }
     }
 
@@ -366,7 +401,7 @@ public class XmlUtil {
         }
     }
 
-    public static void println(String message) {
+    protected static void println(String message) {
         StringBuffer sb = new StringBuffer();
 
         StackTraceElement[] stacks = new Throwable().getStackTrace();
