@@ -13,21 +13,28 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
-
-import com.lcx.xml.serialize.model.ListOrdersResponse;
 
 public class XmlUtil {
 
     private static final String arraySuffix = "Array";
 
     public static void main(String[] args) throws Exception {
-        SAXReader reader = new SAXReader();
-        Document document = reader.read("E:\\work\\test.txt");
+        List<String> item = new ArrayList<String>();
+        for (int i = 0; i < 10; i++) {
+            item.add("item" + i);
+        }
 
-        ListOrdersResponse response = from(document.asXML(), new TypeReference<ListOrdersResponse>() {
+        List<List<String>> list = new ArrayList<List<String>>();
+        for (int i = 0; i < 10; i++) {
+            list.add(item);
+        }
+
+        String xml = toXml(list);
+        println(xml);
+
+        List<String[]> objList = from(xml, new TypeReference<List<String[]>>() {
         });
-        println(toXml(response));
+        println(toXml(objList));
     }
 
     public static String toXml(Object object) throws Exception {
