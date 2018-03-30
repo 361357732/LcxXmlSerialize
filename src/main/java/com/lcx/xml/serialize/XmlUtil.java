@@ -233,6 +233,10 @@ public class XmlUtil {
             } else {
                 makeObject(element.addElement(name), value);
             }
+        } else {
+            if (XmlConfig.isShowNull()) {
+                element.addElement(name);
+            }
         }
     }
 

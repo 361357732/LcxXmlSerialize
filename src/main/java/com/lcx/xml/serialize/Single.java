@@ -1,5 +1,6 @@
 package com.lcx.xml.serialize;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.UUID;
 
@@ -30,6 +31,7 @@ public class Single {
             add(Double.class);
 
             add(UUID.class);
+            add(Date.class);
         }
 
     };
@@ -56,8 +58,11 @@ public class Single {
             return (T) Float.valueOf((String) value);
         } else if (cls == double.class || cls == Double.class) {
             return (T) Double.valueOf((String) value);
+
         } else if (cls == UUID.class) {
             return (T) UUID.fromString((String) value);
+        } else if (cls == Date.class) {
+            return (T) XmlConfig.parseDate((String) value);
         } else {
             return (T) value;
         }
@@ -81,8 +86,11 @@ public class Single {
             return String.valueOf(value);
         } else if (cls == double.class || cls == Double.class) {
             return String.valueOf(value);
+
         } else if (cls == UUID.class) {
             return value.toString();
+        } else if (cls == Date.class) {
+            return XmlConfig.formatDate((Date) value);
         } else {
             return String.valueOf(value);
         }
