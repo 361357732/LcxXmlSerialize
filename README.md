@@ -5,6 +5,7 @@ This is a project similar to gson and Jackson parsing JSON, aiming at serializat
 
 <h2>How To Use</h2>
 <h3>Object<h3>
+
 ``` java
 public static void main(String[] args) throws Exception {
     User record = new User();
@@ -21,7 +22,9 @@ public static void main(String[] args) throws Exception {
 ```
 
 result:<br>
+
 1、print
+
 ``` xml
 <User id="10"><name>lcx</name><sex>true</sex><time>2018-04-02 17:04:35</time></User>
 ```
