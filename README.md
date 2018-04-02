@@ -5,20 +5,18 @@ This is a project similar to gson and Jackson parsing JSON, aiming at serializat
 
 <h2>How To Use</h2>
 <h3>Object<h3>
-```xml
-public static void main(String[] args) throws Exception {
-    User record = new User();
-	record.setId(10);
-	record.setName("lcx");
-	record.setSex(true);
-	record.setTime(new Date());
-
-	String xml = XmlUtil.toXml(record);
-	System.out.println(xml); // 1、print
-	User user = XmlUtil.from(xml, User.class);
-	System.out.println(user.toString()); // 2、print
-}
-```
+    public static void main(String[] args) throws Exception {
+        User record = new User();
+    	record.setId(10);
+    	record.setName("lcx");
+    	record.setSex(true);
+    	record.setTime(new Date());
+    
+    	String xml = XmlUtil.toXml(record);
+    	System.out.println(xml); // 1、print
+    	User user = XmlUtil.from(xml, User.class);
+    	System.out.println(user.toString()); // 2、print
+    }
 
 result:<br>
 1、print
@@ -40,25 +38,23 @@ User [id=10, code=null, name=lcx, sex=true, time=Mon Apr 02 17:04:35 CST 2018]
 
 
 <h3>List</h3>
-```xml
-public static void main(String[] args) throws Exception {
-	User record = new User();
-	record.setId(10);
-	record.setName("lcx");
-	record.setSex(true);
-	record.setTime(new Date());
-
-	List<User> list = new ArrayList<User>();
-	list.add(record);
-	list.add(record);
-
-	String xml = XmlUtil.toXml(list);
-	System.out.println(xml); // 1、print
-	List<User> userList = XmlUtil.from(xml, new TypeReference<List<User>>() {
-	});
-	System.out.println(userList.toString()); // 2、print
-}
-```
+    public static void main(String[] args) throws Exception {
+    	User record = new User();
+    	record.setId(10);
+    	record.setName("lcx");
+    	record.setSex(true);
+    	record.setTime(new Date());
+    
+    	List<User> list = new ArrayList<User>();
+    	list.add(record);
+    	list.add(record);
+    
+    	String xml = XmlUtil.toXml(list);
+    	System.out.println(xml); // 1、print
+    	List<User> userList = XmlUtil.from(xml, new TypeReference<List<User>>() {
+    	});
+    	System.out.println(userList.toString()); // 2、print
+    }
 
 result:<br>
 1、print
@@ -87,24 +83,22 @@ xml format:
 
 
 <h3>XmlConfig</h3>
-```xml
-public static void main(String[] args) throws Exception {
-	User record = new User();
-	record.setId(10);
-	record.setName("lcx");
-	record.setSex(true);
-	record.setTime(new Date());
-
-	// xml config
-	XmlConfig.setShowNull(true);
-	XmlConfig.setTimeFormat("yyyy-MM-dd'T'HH:mm:ss");
-
-	String xml = XmlUtil.toXml(record);
-	System.out.println(xml); // 1、print
-	User user = XmlUtil.from(xml, User.class);
-	System.out.println(user.toString()); // 2、print
-}
-```
+    public static void main(String[] args) throws Exception {
+    	User record = new User();
+    	record.setId(10);
+    	record.setName("lcx");
+    	record.setSex(true);
+    	record.setTime(new Date());
+    
+    	// xml config
+    	XmlConfig.setShowNull(true);
+    	XmlConfig.setTimeFormat("yyyy-MM-dd'T'HH:mm:ss");
+    
+    	String xml = XmlUtil.toXml(record);
+    	System.out.println(xml); // 1、print
+    	User user = XmlUtil.from(xml, User.class);
+    	System.out.println(user.toString()); // 2、print
+    }
 
 result:<br>
 1、print
