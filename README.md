@@ -29,6 +29,7 @@ result:<br>
 <User id="10"><name>lcx</name><sex>true</sex><time>2018-04-02 17:04:35</time></User>
 ```
 xml format:
+
 ``` xml
 <User id="10">
   <name>lcx</name>
@@ -37,12 +38,14 @@ xml format:
 </User>
 ```
 2、print
+
 ``` xml
 User [id=10, code=null, name=lcx, sex=true, time=Mon Apr 02 17:04:35 CST 2018]
 ```
 
 
 <h3>List</h3>
+
 ``` java
 public static void main(String[] args) throws Exception {
 	User record = new User();
@@ -64,11 +67,14 @@ public static void main(String[] args) throws Exception {
 ```
 
 result:<br>
+
 1、print
+
 ``` xml
 <ArrayList><User id="10"><name>lcx</name><sex>true</sex><time>2018-04-02 17:06:32</time></User><User id="10"><name>lcx</name><sex>true</sex><time>2018-04-02 17:06:32</time></User></ArrayList>
 ```
 xml format:
+
 ``` xml
 <ArrayList>
   <User id="10">
@@ -84,12 +90,14 @@ xml format:
 </ArrayList>
 ```
 2、print
+
 ``` xml
 [User [id=10, code=null, name=lcx, sex=true, time=Mon Apr 02 17:06:32 CST 2018], User [id=10, code=null, name=lcx, sex=true, time=Mon Apr 02 17:06:32 CST 2018]]
 ```
 
 
 <h3>XmlConfig</h3>
+
 ``` java
 public static void main(String[] args) throws Exception {
 	User record = new User();
@@ -110,11 +118,14 @@ public static void main(String[] args) throws Exception {
 ```
 
 result:<br>
+
 1、print
+
 ``` xml
 <User id="10"><code/><name>lcx</name><sex>true</sex><time>2018-04-02T17:10:46</time></User>
 ```
 xml format:
+
 ``` xml
 <User id="10">
   <code/>
@@ -124,12 +135,14 @@ xml format:
 </User>
 ```
 2、print
+
 ``` xml
 User [id=10, code=, name=lcx, sex=true, time=Mon Apr 02 17:10:46 CST 2018]
 ```
 
 
 <h4>User.java</h4>
+
 ``` java
 public class User {
 
