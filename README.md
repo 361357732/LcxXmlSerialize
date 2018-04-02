@@ -5,6 +5,7 @@ This is a project similar to gson and Jackson parsing JSON, aiming at serializat
 
 <h2>How To Use</h2>
 <h3>Object<h3>
+```code
     public static void main(String[] args) throws Exception {
         User record = new User();
     	record.setId(10);
@@ -17,6 +18,7 @@ This is a project similar to gson and Jackson parsing JSON, aiming at serializat
     	User user = XmlUtil.from(xml, User.class);
     	System.out.println(user.toString()); // 2、print
     }
+```
 
 result:<br>
 1、print
@@ -38,6 +40,7 @@ User [id=10, code=null, name=lcx, sex=true, time=Mon Apr 02 17:04:35 CST 2018]
 
 
 <h3>List</h3>
+```code
     public static void main(String[] args) throws Exception {
     	User record = new User();
     	record.setId(10);
@@ -55,6 +58,7 @@ User [id=10, code=null, name=lcx, sex=true, time=Mon Apr 02 17:04:35 CST 2018]
     	});
     	System.out.println(userList.toString()); // 2、print
     }
+```
 
 result:<br>
 1、print
@@ -83,6 +87,7 @@ xml format:
 
 
 <h3>XmlConfig</h3>
+```code
     public static void main(String[] args) throws Exception {
     	User record = new User();
     	record.setId(10);
@@ -99,6 +104,7 @@ xml format:
     	User user = XmlUtil.from(xml, User.class);
     	System.out.println(user.toString()); // 2、print
     }
+```
 
 result:<br>
 1、print
@@ -121,6 +127,7 @@ User [id=10, code=, name=lcx, sex=true, time=Mon Apr 02 17:10:46 CST 2018]
 
 
 <h4>User.java</h4>
+```code
     public class User {
     
         @XmlAttribute
@@ -179,3 +186,4 @@ User [id=10, code=, name=lcx, sex=true, time=Mon Apr 02 17:10:46 CST 2018]
             return "User [id=" + id + ", code=" + code + ", name=" + name + ", sex=" + sex + ", time=" + time + "]";
         }
     }
+```
