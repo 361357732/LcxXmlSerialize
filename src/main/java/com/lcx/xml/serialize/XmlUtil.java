@@ -4,6 +4,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -19,22 +20,39 @@ public class XmlUtil {
     private static final String arraySuffix = "Array";
 
     public static void main(String[] args) throws Exception {
-        List<String> item = new ArrayList<String>();
+        // List<String> item = new ArrayList<String>();
+        // for (int i = 0; i < 10; i++) {
+        // item.add("item" + i);
+        // }
+        //
+        // List<List<String>> list = new ArrayList<List<String>>();
+        // for (int i = 0; i < 10; i++) {
+        // list.add(item);
+        // }
+        //
+        // String xml = toXml(list);
+        // println(xml);
+        //
+        // List<String[]> objList = from(xml, new
+        // TypeReference<List<String[]>>() {
+        // });
+        // println(toXml(objList));
+
+        Map<String, Integer> item = new HashMap<String, Integer>();
         for (int i = 0; i < 10; i++) {
-            item.add("item" + i);
+            item.put("item" + i, 1111 * i);
         }
 
-        List<List<String>> list = new ArrayList<List<String>>();
-        for (int i = 0; i < 10; i++) {
-            list.add(item);
+        Map<String, Map<String, Integer>> map = new HashMap<String, Map<String, Integer>>();
+        for (int i = 0; i < 5; i++) {
+            map.put("iiii" + i, item);
         }
+        println(toXml(map));
 
-        String xml = toXml(list);
-        println(xml);
-
-        List<String[]> objList = from(xml, new TypeReference<List<String[]>>() {
-        });
-        println(toXml(objList));
+        Map<String, Map<String, String>> tempMap = from(toXml(map),
+                new TypeReference<Map<String, Map<String, String>>>() {
+                });
+        println(toXml(tempMap));
     }
 
     public static String toXml(Object object) throws Exception {
@@ -47,7 +65,7 @@ public class XmlUtil {
         } else if (isCollection(object.getClass())) {
             makeCollection(document.addElement(object.getClass().getSimpleName()), (Collection<?>) object);
         } else if (isMap(object.getClass())) {
-
+            makeMap(document.addElement(object.getClass().getSimpleName()), (Map<?, ?>) object);
         } else {
             makeObject(document.addElement(object.getClass().getSimpleName()), object);
         }
@@ -89,7 +107,7 @@ public class XmlUtil {
         } else if (isCollection(cls)) {
             return (T) parseCollection(element, list, 1);
         } else if (isMap(cls)) {
-            return null;
+            return (T) parseMap(element, list, 1);
         } else {
             return (T) parseObject(element, cls);
         }
@@ -127,7 +145,8 @@ public class XmlUtil {
                 List<Class<?>> list = Generic.getClassList(fields[i].getGenericType());
                 value = parseCollection(element, list, 1);
             } else if (isMap(fields[i].getType())) {
-
+                List<Class<?>> list = Generic.getClassList(fields[i].getGenericType());
+                value = parseMap(element, list, 1);
             } else {
                 value = parseObject(element, fields[i].getType());
             }
@@ -156,7 +175,8 @@ public class XmlUtil {
                 List<Class<?>> clsList = Generic.getClassList(cls.getGenericSuperclass());
                 list.add((T) parseCollection(itemElement, clsList, 1));
             } else if (isMap(cls)) {
-
+                List<Class<?>> clsList = Generic.getClassList(cls.getGenericSuperclass());
+                list.add((T) parseMap(itemElement, clsList, 1));
             } else {
                 list.add(parseObject(itemElement, cls));
             }
@@ -183,13 +203,41 @@ public class XmlUtil {
             } else if (isCollection(cls)) {
                 list.add(parseCollection(itemElement, clsList, index + 1));
             } else if (isMap(cls)) {
-
+                list.add(parseMap(itemElement, clsList, index + 1));
             } else {
                 list.add(parseObject(itemElement, cls));
             }
         }
 
         return list;
+    }
+
+    private static Map<?, ?> parseMap(Element element, List<Class<?>> clsList, int index) throws Exception {
+        if (element == null || clsList.size() == 0) {
+            return null;
+        }
+
+        Class<?> keyCls = clsList.get(index);
+        Class<?> valueCls = clsList.get(index + 1);
+        Map<Object, Object> map = new HashMap<Object, Object>();
+        for (Iterator<?> iterator = element.elementIterator(); iterator.hasNext();) {
+            Element itemElement = (Element) iterator.next();
+
+            Object key = Single.parseValue(keyCls, itemElement.getName());
+            if (isSingle(valueCls)) {
+                map.put(key, Single.parseValue(valueCls, itemElement.getText()));
+            } else if (isArray(valueCls)) {
+                map.put(key, parseArray(itemElement, valueCls));
+            } else if (isCollection(valueCls)) {
+                map.put(key, parseCollection(itemElement, clsList, index + 2));
+            } else if (isMap(valueCls)) {
+                map.put(key, parseMap(itemElement, clsList, index + 2));
+            } else {
+                map.put(key, parseObject(itemElement, valueCls));
+            }
+        }
+
+        return map;
     }
 
     private static void makeObject(Element element, Object object) throws Exception {
@@ -227,6 +275,16 @@ public class XmlUtil {
         }
     }
 
+    private static <K, V> void makeMap(Element element, Map<K, V> map) throws Exception {
+        if (map == null || map.size() == 0) {
+            return;
+        }
+
+        for (K key : map.keySet()) {
+            addElement(element, Single.formatValue(key), map.get(key));
+        }
+    }
+
     private static void addElement(Element element, String name, Object value) throws Exception {
         if (value != null) {
             if (isSingle(value.getClass())) {
@@ -236,7 +294,7 @@ public class XmlUtil {
             } else if (isCollection(value.getClass())) {
                 makeCollection(element.addElement(name), (Collection<?>) value);
             } else if (isMap(value.getClass())) {
-
+                makeMap(element.addElement(name), (Map<?, ?>) value);
             } else {
                 makeObject(element.addElement(name), value);
             }
