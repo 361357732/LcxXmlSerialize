@@ -20,24 +20,6 @@ public class XmlUtil {
     private static final String arraySuffix = "Array";
 
     public static void main(String[] args) throws Exception {
-        // List<String> item = new ArrayList<String>();
-        // for (int i = 0; i < 10; i++) {
-        // item.add("item" + i);
-        // }
-        //
-        // List<List<String>> list = new ArrayList<List<String>>();
-        // for (int i = 0; i < 10; i++) {
-        // list.add(item);
-        // }
-        //
-        // String xml = toXml(list);
-        // println(xml);
-        //
-        // List<String[]> objList = from(xml, new
-        // TypeReference<List<String[]>>() {
-        // });
-        // println(toXml(objList));
-
         Map<String, Integer> item = new HashMap<String, Integer>();
         for (int i = 0; i < 10; i++) {
             item.put("item" + i, 1111 * i);
@@ -245,7 +227,7 @@ public class XmlUtil {
         for (int i = 0; i < fields.length; i++) {
             Object item = Reflex.getFieldValue(object, fields[i]);
 
-            addElement(element, fields[i].getName(), item);
+            addElement(element, fields[i].getName(), item, fields[i].getAnnotation(XmlAttribute.class));
         }
     }
 
@@ -257,7 +239,7 @@ public class XmlUtil {
         for (int i = 0; i < Array.getLength(array); ++i) {
             Object item = Array.get(array, i);
 
-            addElement(element, item.getClass().getSimpleName(), item);
+            addElement(element, item.getClass().getSimpleName(), item, null);
         }
     }
 
@@ -268,9 +250,9 @@ public class XmlUtil {
 
         for (Object item : collection) {
             if (isArray(item.getClass())) {
-                addElement(element, item.getClass().getComponentType().getSimpleName() + arraySuffix, item);
+                addElement(element, item.getClass().getComponentType().getSimpleName() + arraySuffix, item, null);
             } else {
-                addElement(element, item.getClass().getSimpleName(), item);
+                addElement(element, item.getClass().getSimpleName(), item, null);
             }
         }
     }
@@ -281,14 +263,18 @@ public class XmlUtil {
         }
 
         for (K key : map.keySet()) {
-            addElement(element, Single.formatValue(key), map.get(key));
+            addElement(element, Single.formatValue(key), map.get(key), null);
         }
     }
 
-    private static void addElement(Element element, String name, Object value) throws Exception {
+    private static void addElement(Element element, String name, Object value, XmlAttribute attr) throws Exception {
         if (value != null) {
             if (isSingle(value.getClass())) {
-                element.addElement(name).setText(Single.formatValue(value));
+                if (attr != null) {
+                    element.addAttribute(name, Single.formatValue(value));
+                } else {
+                    element.addElement(name).setText(Single.formatValue(value));
+                }
             } else if (isArray(value.getClass())) {
                 makeArray(element.addElement(name), value);
             } else if (isCollection(value.getClass())) {
