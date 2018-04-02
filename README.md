@@ -4,7 +4,7 @@
 This is a project similar to gson and Jackson parsing JSON, aiming at serialization and deserialization of XML.
 
 <h2>How To Use</h2>
-<h3>Object<h3>
+<h3>Object</h3>
 
 ``` java
 public static void main(String[] args) throws Exception {
