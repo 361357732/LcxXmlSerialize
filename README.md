@@ -5,20 +5,20 @@ This is a project similar to gson and Jackson parsing JSON, aiming at serializat
 
 <h2>How To Use</h2>
 <h3>Object<h3>
-	``` java
-	public static void main(String[] args) throws Exception {
-	    User record = new User();
-		record.setId(10);
-		record.setName("lcx");
-		record.setSex(true);
-		record.setTime(new Date());
+``` java
+public static void main(String[] args) throws Exception {
+	User record = new User();
+	record.setId(10);
+	record.setName("lcx");
+	record.setSex(true);
+	record.setTime(new Date());
 
-		String xml = XmlUtil.toXml(record);
-		System.out.println(xml); // 1、print
-		User user = XmlUtil.from(xml, User.class);
-		System.out.println(user.toString()); // 2、print
-	}
-	```
+	String xml = XmlUtil.toXml(record);
+	System.out.println(xml); // 1、print
+	User user = XmlUtil.from(xml, User.class);
+	System.out.println(user.toString()); // 2、print
+}
+```
 
 result:<br>
 1、print
