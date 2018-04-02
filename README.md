@@ -5,7 +5,7 @@ This is a project similar to gson and Jackson parsing JSON, aiming at serializat
 
 <h2>How To Use</h2>
 <h3>Object<h3>
-``` java
+    ``` java
     public static void main(String[] args) throws Exception {
         User record = new User();
     	record.setId(10);
@@ -18,7 +18,7 @@ This is a project similar to gson and Jackson parsing JSON, aiming at serializat
     	User user = XmlUtil.from(xml, User.class);
     	System.out.println(user.toString()); // 2、print
     }
-```
+    ```
 
 result:<br>
 1、print
