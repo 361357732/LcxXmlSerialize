@@ -8,7 +8,7 @@ This is a project similar to gson and Jackson parsing JSON, aiming at serializat
 
 ``` java
 public static void main(String[] args) throws Exception {
-    User record = new User();
+	User record = new User();
 	record.setId(10);
 	record.setName("lcx");
 	record.setSex(true);
