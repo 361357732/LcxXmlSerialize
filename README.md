@@ -5,7 +5,7 @@ This is a project similar to gson and Jackson parsing JSON, aiming at serializat
 
 <h2>How To Use</h2>
 <h3>Object<h3>
-```code
+``` java
     public static void main(String[] args) throws Exception {
         User record = new User();
     	record.setId(10);
@@ -22,11 +22,11 @@ This is a project similar to gson and Jackson parsing JSON, aiming at serializat
 
 result:<br>
 1、print
-```xml
+``` xml
 <User id="10"><name>lcx</name><sex>true</sex><time>2018-04-02 17:04:35</time></User>
 ```
 xml format:
-```xml
+``` xml
 <User id="10">
   <name>lcx</name>
   <sex>true</sex>
@@ -34,13 +34,13 @@ xml format:
 </User>
 ```
 2、print
-```xml
+``` xml
 User [id=10, code=null, name=lcx, sex=true, time=Mon Apr 02 17:04:35 CST 2018]
 ```
 
 
 <h3>List</h3>
-```code
+``` java
     public static void main(String[] args) throws Exception {
     	User record = new User();
     	record.setId(10);
@@ -62,11 +62,11 @@ User [id=10, code=null, name=lcx, sex=true, time=Mon Apr 02 17:04:35 CST 2018]
 
 result:<br>
 1、print
-```xml
+``` xml
 <ArrayList><User id="10"><name>lcx</name><sex>true</sex><time>2018-04-02 17:06:32</time></User><User id="10"><name>lcx</name><sex>true</sex><time>2018-04-02 17:06:32</time></User></ArrayList>
 ```
 xml format:
-```xml
+``` xml
 <ArrayList>
   <User id="10">
     <name>lcx</name>
@@ -81,13 +81,13 @@ xml format:
 </ArrayList>
 ```
 2、print
-```xml
+``` xml
 [User [id=10, code=null, name=lcx, sex=true, time=Mon Apr 02 17:06:32 CST 2018], User [id=10, code=null, name=lcx, sex=true, time=Mon Apr 02 17:06:32 CST 2018]]
 ```
 
 
 <h3>XmlConfig</h3>
-```code
+``` java
     public static void main(String[] args) throws Exception {
     	User record = new User();
     	record.setId(10);
@@ -108,11 +108,11 @@ xml format:
 
 result:<br>
 1、print
-```xml
+``` xml
 <User id="10"><code/><name>lcx</name><sex>true</sex><time>2018-04-02T17:10:46</time></User>
 ```
 xml format:
-```xml
+``` xml
 <User id="10">
   <code/>
   <name>lcx</name>
@@ -121,13 +121,13 @@ xml format:
 </User>
 ```
 2、print
-```xml
+``` xml
 User [id=10, code=, name=lcx, sex=true, time=Mon Apr 02 17:10:46 CST 2018]
 ```
 
 
 <h4>User.java</h4>
-```code
+``` java
     public class User {
     
         @XmlAttribute
