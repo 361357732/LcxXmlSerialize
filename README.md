@@ -5,7 +5,7 @@ This is a project similar to gson and Jackson parsing JSON, aiming at serializat
 
 ## How To Use
 
-### * Object
+* ### Object
 
 ``` java
 public static void main(String[] args) throws Exception {
