@@ -45,7 +45,7 @@ User [id=10, code=null, name=lcx, sex=true, time=Mon Apr 02 17:04:35 CST 2018]
 ```
 
 
-<h3>List</h3>
+### List
 
 ``` java
 public static void main(String[] args) throws Exception {
@@ -97,7 +97,7 @@ xml format:
 ```
 
 
-<h3>XmlConfig</h3>
+### XmlConfig
 
 ``` java
 public static void main(String[] args) throws Exception {
@@ -142,7 +142,7 @@ User [id=10, code=, name=lcx, sex=true, time=Mon Apr 02 17:10:46 CST 2018]
 ```
 
 
-<h4>User.java</h4>
+#### User.java
 
 ``` java
 public class User {
