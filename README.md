@@ -1,11 +1,11 @@
-#LcxXmlSerialize
+# LcxXmlSerialize
 
-##Description
+## Description
 This is a project similar to gson and Jackson parsing JSON, aiming at serialization and deserialization of XML.
 
-##How To Use
+## How To Use
 
-###Object
+### Object
 
 ``` java
 public static void main(String[] args) throws Exception {
