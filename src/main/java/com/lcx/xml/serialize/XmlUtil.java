@@ -37,22 +37,28 @@ public class XmlUtil {
         println(toXml(tempMap));
     }
 
-    public static String toXml(Object object) throws Exception {
-        Document document = DocumentHelper.createDocument();
+    public static String toXml(Object object) {
+        try {
+            Document document = DocumentHelper.createDocument();
 
-        if (isSingle(object.getClass())) {
-            Single.formatValue(object);
-        } else if (isArray(object.getClass())) {
-            makeArray(document.addElement(object.getClass().getComponentType().getSimpleName() + arraySuffix), object);
-        } else if (isCollection(object.getClass())) {
-            makeCollection(document.addElement(object.getClass().getSimpleName()), (Collection<?>) object);
-        } else if (isMap(object.getClass())) {
-            makeMap(document.addElement(object.getClass().getSimpleName()), (Map<?, ?>) object);
-        } else {
-            makeObject(document.addElement(object.getClass().getSimpleName()), object);
+            if (isSingle(object.getClass())) {
+                Single.formatValue(object);
+            } else if (isArray(object.getClass())) {
+                makeArray(document.addElement(object.getClass().getComponentType().getSimpleName() + arraySuffix),
+                        object);
+            } else if (isCollection(object.getClass())) {
+                makeCollection(document.addElement(object.getClass().getSimpleName()), (Collection<?>) object);
+            } else if (isMap(object.getClass())) {
+                makeMap(document.addElement(object.getClass().getSimpleName()), (Map<?, ?>) object);
+            } else {
+                makeObject(document.addElement(object.getClass().getSimpleName()), object);
+            }
+
+            return document.getRootElement().asXML();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
-
-        return document.getRootElement().asXML();
     }
 
     public static <T> T from(String message, Class<T> cls) throws Exception {
@@ -62,19 +68,34 @@ public class XmlUtil {
         return parse(message, null, list);
     }
 
-    public static <T> T from(String message, String nodeName, Class<T> cls) throws Exception {
+    public static <T> T from(String message, String nodeName, Class<T> cls) {
         List<Class<?>> list = new ArrayList<Class<?>>();
         list.add(cls);
 
-        return parse(message, nodeName, list);
+        try {
+            return parse(message, nodeName, list);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    public static <T> T from(String message, TypeReference<T> type) throws Exception {
-        return parse(message, null, Generic.getClassList(type.getType()));
+    public static <T> T from(String message, TypeReference<T> type) {
+        try {
+            return parse(message, null, Generic.getClassList(type.getType()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    public static <T> T from(String message, String nodeName, TypeReference<T> type) throws Exception {
-        return parse(message, nodeName, Generic.getClassList(type.getType()));
+    public static <T> T from(String message, String nodeName, TypeReference<T> type) {
+        try {
+            return parse(message, nodeName, Generic.getClassList(type.getType()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @SuppressWarnings("unchecked")
